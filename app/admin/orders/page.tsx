@@ -1,0 +1,1 @@
+import { AdminList } from '@/components/admin-list'; export default function Orders(){return <AdminList title="Inquiry WhatsApp" description="Catat inquiry manual tanpa menganggapnya sebagai pesanan terkonfirmasi."/>}

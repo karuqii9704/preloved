@@ -1,0 +1,1 @@
+import { AdminList } from '@/components/admin-list'; export default function Consignment(){return <AdminList title="Review Titip Jual" description="Kontak penjual, feedback, harga jual usulan, dan publikasi produk dikelola privat."/>}

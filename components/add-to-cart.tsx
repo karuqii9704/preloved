@@ -1,0 +1,4 @@
+'use client'
+import { Product } from '@/lib/types'
+
+export function AddToCart({product}:{product:Product}) { const unavailable=product.status!=='available'; function add(){const key='preloved-cart-v1'; const cart=JSON.parse(localStorage.getItem(key)||'[]'); const found=cart.find((line:{id:string})=>line.id===product.id); if(found) found.quantity+=1; else cart.push({id:product.id,code:product.code,name:product.name,price:product.price,promoPrice:product.promoPrice,status:product.status,image:product.image,quantity:1}); localStorage.setItem(key,JSON.stringify(cart)); window.dispatchEvent(new Event('cart-updated'))} return <button type="button" className="btn" onClick={add} disabled={unavailable} style={unavailable?{opacity:.55,cursor:'not-allowed'}:undefined}>{unavailable?'Tidak tersedia':'Tambah ke keranjang'}</button> }

@@ -1,0 +1,2 @@
+import { StoreShell } from '@/components/store-shell'; import { ProductCard } from '@/components/product-card'; import { activeProducts } from '@/lib/catalog'
+export default function Highlighted(){return <StoreShell><section className="shell section"><p className="eyebrow">Pilihan kami</p><h1>Highlighted</h1><div className="grid">{activeProducts.filter(p=>p.featured).map(p=><ProductCard key={p.id} product={p}/>)}</div></section></StoreShell>}

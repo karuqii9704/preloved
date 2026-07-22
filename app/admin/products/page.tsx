@@ -1,0 +1,1 @@
+import { AdminList } from '@/components/admin-list'; export default function ProductsAdmin(){return <AdminList title="Produk" description="Kelola katalog, status, foto, dan produk unggulan." newHref="/admin/products/new"/>}

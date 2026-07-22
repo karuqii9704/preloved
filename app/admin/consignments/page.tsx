@@ -1,0 +1,1 @@
+import { AdminList } from '@/components/admin-list'; export default function Consignments(){return <AdminList title="Titip Jual" description="Review, setujui, tolak, atau publikasikan request Titip Jual."/>}
