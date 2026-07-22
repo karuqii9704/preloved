@@ -1,2 +1,1 @@
-import { BriefLanding } from '@/components/brief-landing'
-export default function Home(){return <BriefLanding/>}
+export { default } from './home/page'
