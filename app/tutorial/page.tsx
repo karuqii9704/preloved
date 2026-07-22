@@ -29,7 +29,7 @@ export default function Tutorial() {
           Panduan ini hanya berjalan saat kamu mengaktifkannya. Ikuti empat langkah untuk melihat cara katalog, pesanan WhatsApp, dan Titip Jual bekerja.
         </p>
         {!active ? (
-          <section style={{ marginTop: 28, padding: 20, border: '1px solid #f4cfdd', borderRadius: 16, background: 'var(--pink-soft-gradient)' }}>
+          <section style={{ marginTop: 28, padding: 20, border: '1px solid #f4cfdd', borderRadius: 16, background: 'var(--rose-wash)' }}>
             <h2 style={{ marginTop: 0 }}>Panduan belum dimulai</h2>
             <p>Kamu dapat menutupnya kapan saja tanpa mengubah data atau pesanan.</p>
             <button className="btn" onClick={() => setActive(true)}><Play size={16} /> Mulai panduan</button>
