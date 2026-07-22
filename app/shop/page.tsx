@@ -1,4 +1,32 @@
 import { StoreShell } from '@/components/store-shell'
 import { ProductCard } from '@/components/product-card'
 import { activeProducts } from '@/lib/catalog'
-export default function Shop(){return <StoreShell><section className="shell section"><p className="eyebrow">Katalog</p><h1 style={{fontSize:'clamp(2rem,5vw,3.5rem)',letterSpacing:'-.06em',margin:'6px 0 18px'}}>Temukan yang pas.</h1><form role="search" className="shop-filters"><label className="field"><span className="sr-only">Cari produk</span><input type="search" placeholder="Cari produk" /></label><select aria-label="Kategori"><option>Semua kategori</option><option>Pakaian</option><option>Aksesori</option><option>Sepatu</option></select><select aria-label="Urutkan"><option>Terbaru</option><option>Harga terendah</option><option>Harga tertinggi</option></select></form><div className="grid">{activeProducts.map(product=><ProductCard key={product.id} product={product}/>)}</div></section></StoreShell>}
+
+export default function Shop() {
+  return (
+    <StoreShell>
+      <section className="shell section">
+        <p className="eyebrow">Katalog</p>
+        <h1 className="page-title">Temukan yang pas.</h1>
+        <form role="search" className="shop-filters">
+          <label className="field">
+            <span className="sr-only">Cari produk</span>
+            <input type="search" placeholder="Cari produk" />
+          </label>
+          <select aria-label="Kategori">
+            <option>Semua kategori</option>
+            <option>Pakaian</option>
+            <option>Aksesori</option>
+            <option>Sepatu</option>
+          </select>
+          <select aria-label="Urutkan">
+            <option>Terbaru</option>
+            <option>Harga terendah</option>
+            <option>Harga tertinggi</option>
+          </select>
+        </form>
+        <div className="grid">{activeProducts.map(product => <ProductCard key={product.id} product={product} />)}</div>
+      </section>
+    </StoreShell>
+  )
+}
