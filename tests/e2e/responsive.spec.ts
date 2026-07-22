@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const routes=['/','/home','/shop','/get-started']
+const routes=['/','/home','/shop','/get-started','/tutorial']
 
 test.describe('mobile storefront',()=>{
   test.beforeEach(async({isMobile})=>{
