@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { detectIntent } from "@/lib/cs/intent";
 import { buildAnswer } from "@/lib/cs/engine";
 import { buildHandoffLink } from "@/lib/cs";
+import { getStoreSettings } from "@/lib/store-settings";
 
 export const runtime = "nodejs";
 
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Pesan kosong atau terlalu panjang." }, { status: 400 });
   }
 
-  // 1) Eskalasi dulu: komplain & permintaan manusia tidak disentuh AI jawaban
+  // 1) Eskalasi: komplain & permintaan manusia tidak disentuh AI jawaban
   const detected = detectIntent(text);
   if (detected && (detected.intent === "COMPLAINT" || detected.intent === "ASK_HUMAN")) {
     const history = Array.isArray(body.history) ? body.history.slice(-6) : [];
@@ -33,11 +34,12 @@ export async function POST(request: Request) {
       detected.intent === "COMPLAINT"
         ? "Waduh, mohon maaf banget pengalamannya nggak menyenangkan 🙏\nAku hubungkan sekarang sama admin manusia ya — rangkuman percakapan kita udah aku siapkan otomatis di WhatsApp."
         : "Baik! Aku siapkan obrolan langsung sama admin manusia ya 🙋\nRangkuman chat kita otomatis ikut terkirim biar kamu nggak perlu ulang cerita.";
+    const settings = await getStoreSettings();
     return NextResponse.json({
       handoff: true,
       reason,
       intro,
-      handoffUrl: buildHandoffLink([...history, { sender: "customer", text }], reason),
+      handoffUrl: buildHandoffLink([...history, { sender: "customer", text }], reason, settings.whatsapp_number),
       intent: detected.intent,
       confidence: detected.confidence,
     });

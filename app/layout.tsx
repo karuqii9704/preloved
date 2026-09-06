@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { CsWidget } from '@/components/cs-widget'
+import { StoreSettingsProvider } from '@/components/store-settings-context'
 
 export const metadata: Metadata = {
   title: 'Preloved | Barang pilihan, proses yang jelas',
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="id"><body>{children}<CsWidget /></body></html>
+  return <html lang="id"><body><StoreSettingsProvider>{children}<CsWidget /></StoreSettingsProvider></body></html>
 }

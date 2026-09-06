@@ -1,6 +1,7 @@
 "use client";
 // Widget asisten CS "Prelo" — melayang kanan-bawah, stateless, tanpa dependensi.
 import { useEffect, useRef, useState } from "react";
+import { useStoreSettings } from "@/components/store-settings-context";
 
 type Msg = { sender: "customer" | "ai" | "system"; text: string; handoffUrl?: string };
 
@@ -17,6 +18,7 @@ export function CsWidget() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const { settings } = useStoreSettings();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
