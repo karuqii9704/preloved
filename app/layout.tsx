@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { CsWidget } from '@/components/cs-widget'
 
 export const metadata: Metadata = {
   title: 'Preloved | Barang pilihan, proses yang jelas',
@@ -7,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="id"><body>{children}</body></html>
+  return <html lang="id"><body>{children}<CsWidget /></body></html>
 }
