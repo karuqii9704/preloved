@@ -59,8 +59,21 @@ Restart dev server (`npm run dev`) setelah mengisi env.
    - link eskalasi admin di asisten CS,
    - link Instagram/Facebook di footer.
 
-## Catatan keamanan
+## 6. Manajemen credential admin
 
+- **Ganti password:** Supabase → Authentication → Users → klik user → *Change
+  password*. Atau dari halaman login bila reset email dikonfigurasi.
+- **Tambah admin baru:** Add user (langkah 3) → jalankan ulang `insert into
+  public.profiles ... where email = '<email baru>'`.
+- **Cabut akses:** hapus baris user di tabel `profiles`, atau nonaktifkan/hapus
+  user di Authentication. Middleware & RLS membaca tabel `profiles`, jadi
+  akses langsung berhenti.
+- **Session:** login disimpan sebagai cookie session Supabase; logout lewat
+  tombol "Keluar" di nav admin.
+- Tidak ada kredensial default tercetak di kode — password hanya ada di Supabase
+  Auth (di-hash di sana). Repo tidak menyimpan rahasia apa pun.
+
+## Catatan keamanan
 - Tanpa env Supabase: halaman admin selalu redirect ke login, API admin menolak
   permintaan (503) — tidak ada akses publik.
 - `SUPABASE_SERVICE_ROLE_KEY` hanya dipakai server-side (API route), tidak pernah
