@@ -1,6 +1,7 @@
 // Rule-based intent router domain preloved (Bahasa Indonesia informal).
 // Semua intent rutin selesai tanpa LLM (<50ms, gratis).
-import { CATALOG } from "./kb";
+// Katalog dipass sebagai argumen — diisi caller dari getCatalog() (Supabase live).
+import type { CatalogItem } from "./kb";
 
 const normalize = (t: string) =>
   t.toLowerCase().replace(/brp|brapa|brpa/g, "berapa").replace(/yg|yng/g, "yang")
@@ -42,28 +43,23 @@ export function detectIntent(raw: string): Detected | null {
   return null; // → fallback path
 }
 
-/** Cocokkan penyebutan produk: nama, kode (plv-0002), atau kategori. */
-export type ProductMatch = (typeof CATALOG_INDEX)[number];
+export type IndexedItem = CatalogItem & { keywords: string[] };
 
-export function matchProduct(raw: string): ProductMatch | null {
+/** Cocokkan penyebutan produk: nama, kode (plv-0002), atau kategori. */
+export function matchProduct(raw: string, catalog: CatalogItem[]): CatalogItem | null {
   const t = normalize(raw);
-  let best: ProductMatch | null = null;
+  let best: CatalogItem | null = null;
   let bestScore = 0;
-  for (const p of CATALOG_INDEX) {
+  for (const p of catalog) {
+    const keywords = [
+      p.code.toLowerCase(),
+      p.category.toLowerCase(),
+      p.slug.replace(/-/g, " "),
+      ...p.name.toLowerCase().split(" ").filter((w) => w.length > 3),
+    ];
     let score = 0;
-    for (const kw of p.keywords) if (t.includes(kw)) score += kw.length;
+    for (const kw of keywords) if (t.includes(kw)) score += kw.length;
     if (score > bestScore) { bestScore = score; best = p; }
   }
   return best;
 }
-
-// Index kata kunci per produk dari nama, kode, slug, dan kategori.
-const CATALOG_INDEX = CATALOG.map((p) => ({
-  ...p,
-  keywords: [
-    p.code.toLowerCase(),
-    p.category.toLowerCase(),
-    p.slug.replace(/-/g, " "),
-    ...p.name.toLowerCase().split(" ").filter((w) => w.length > 3),
-  ],
-}));

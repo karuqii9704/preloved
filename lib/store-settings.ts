@@ -20,11 +20,9 @@ export const DEFAULT_SETTINGS: StoreSettings = {
 
 export const FALLBACK_WA = '6285123071588'
 
-let cache: StoreSettings | null = null
-
-/** Ambil pengaturan (server-side). Unstable cache per request; jangan di-cache antar-request. */
+/** Ambil pengaturan (server-side). Dibaca segar tiap request — cache modul
+ *  sengaja TIDAK dipakai agar perubahan di halaman admin langsung aktif. */
 export async function getStoreSettings(): Promise<StoreSettings> {
-  if (cache) return cache
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) return DEFAULT_SETTINGS
@@ -32,8 +30,7 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     const admin = createClient(url, key, { auth: { persistSession: false } })
     const { data, error } = await admin.from('store_settings').select('store_name,whatsapp_number,instagram_url,facebook_url,contact_note').eq('id', true).maybeSingle()
     if (error || !data) return DEFAULT_SETTINGS
-    cache = data as StoreSettings
-    return cache
+    return data as StoreSettings
   } catch {
     return DEFAULT_SETTINGS
   }

@@ -2,12 +2,12 @@
 // Semua angka (harga/status/kondisi) berasal dari lib/catalog.ts, tidak ada
 // yang digenerate bebas. Eskalasi ditangani di API route via buildHandoffLink.
 import { detectIntent, matchProduct, type Detected } from "./intent";
-import { CATALOG, STORE, TITIP_JUAL, CONDITION_LABELS } from "./kb";
+import { STORE, TITIP_JUAL, CONDITION_LABELS, type CatalogItem } from "./kb";
 import { formatIDR } from "../catalog";
 
 const rupiah = formatIDR;
 
-function productLines(p: (typeof CATALOG)[number]): string[] {
+function productLines(p: CatalogItem): string[] {
   const statusText: Record<string, string> = {
     available: "Ready ✅",
     reserved: "Lagi *reserved* ya kak 🙏 (ada yang lagi proses beli)",
@@ -29,7 +29,8 @@ function productLines(p: (typeof CATALOG)[number]): string[] {
 /** Bangun balasan grounded. Return null untuk intent eskalasi/tak dikenal. */
 export function buildAnswer(
   detected: Pick<Detected, "intent" | "normalized">,
-  raw: string
+  raw: string,
+  catalog: CatalogItem[]
 ): { reply: string; confidence: number } | null {
   switch (detected.intent) {
     case "GREETING":
@@ -47,7 +48,7 @@ export function buildAnswer(
       const lines = [
         "Untuk pesanan lewat website:\n1. Pilih barang → klik *Pesan via WhatsApp*\n2. Chat admin kebuka otomatis berisi nama, alamat, dan daftar pesananmu\n3. Admin balas dengan info ketersediaan, ongkir, dan pembayaran",
       ];
-      const p = matchProduct(raw);
+      const p = matchProduct(raw, catalog);
       if (p && p.status === "available")
         lines.push(`\nBtw, *${p.name}* [${p.code}] masih available kalau mau sekalian dipesan 😉`);
       return { reply: lines.join("\n"), confidence: 0.9 };
@@ -69,9 +70,9 @@ export function buildAnswer(
     }
 
     case "AVAILABILITY": {
-      const p = matchProduct(raw);
+      const p = matchProduct(raw, catalog);
       if (!p) {
-        const avail = CATALOG.filter((x) => x.status === "available");
+        const avail = catalog.filter((x) => x.status === "available");
         return {
           reply:
             "Boleh sebutkan barangnya kak? Yang tersedia saat ini:\n" +
@@ -83,7 +84,7 @@ export function buildAnswer(
     }
 
     case "CONDITION_Q": {
-      const p = matchProduct(raw);
+      const p = matchProduct(raw, catalog);
       if (!p)
         return {
           reply:
@@ -96,9 +97,9 @@ export function buildAnswer(
     }
 
     case "PRICE_QUERY": {
-      const p = matchProduct(raw);
+      const p = matchProduct(raw, catalog);
       if (!p) {
-        const list = CATALOG.filter((x) => x.status !== "sold").map(
+        const list = catalog.filter((x) => x.status !== "sold").map(
           (x) =>
             `• ${x.name} [${x.code}] — ${
               x.promoPrice ? `~~${rupiah(x.price)}~~ *${rupiah(x.effectivePrice)}*` : rupiah(x.effectivePrice)

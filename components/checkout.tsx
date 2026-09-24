@@ -49,7 +49,7 @@ export function Checkout({ lines }: { lines: CartLine[] }) {
 
   const total = cartTotal(lines)
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (name.trim().length < 2 || address.trim().length < 5) {
       setError('Nama minimal 2 karakter dan alamat minimal 5 karakter.')
@@ -57,26 +57,35 @@ export function Checkout({ lines }: { lines: CartLine[] }) {
     }
     setError('')
     setSending(true)
+    // Buka tab WA SEGERA (masih dalam gesture klik — menghindari popup blocker),
+    // lalu isi URL setelah inquiry tercatat. about:blank → wa.me redirect.
+    const wa = window.open('about:blank', '_blank')
+    if (!wa) {
+      setSending(false)
+      setError('Pop-up WhatsApp diblokir browser. Izinkan pop-up lalu coba lagi — keranjangmu tetap aman.')
+      return
+    }
     const order = lines.map((line, i) =>
       `${i + 1}. [${line.code}] ${line.name}, ${formatIDR(line.promoPrice ?? line.price)}`
     ).join('\n')
     const message =
       `Halo Kak, saya ingin memesan barang berikut.\n\nNama: ${name.trim()}\nAlamat: ${address.trim()}\n\nPesanan:\n${order}\n\nTotal: ${formatIDR(total)}\n\nMohon informasi ketersediaan barang, ongkir, dan metode pembayarannya. Terima kasih.`
-    // window.open harus terjadi di handler klik langsung agar tidak diblokir
-    // popup blocker. Catatan: opsi ketiga 'noopener' membuat window.open SELALU
-    // mengembalikan null (spec browser), jadi keamanan noopener diterapkan
-    // manual via wa.opener = null — return value tetap bisa dipakai untuk
-    // mendeteksi popup blocker. Keranjang hanya dikosongkan bila tab WA benar-benar terbuka.
-    const wa = window.open(
-      `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(message)}`,
-      '_blank'
-    )
-    setSending(false)
-    if (!wa) {
-      setError('Pop-up WhatsApp diblokir browser. Izinkan pop-up lalu coba lagi — keranjangmu tetap aman.')
-      return
-    }
+    // Catat inquiry ke DB (best-effort — kegagalan tidak memblokir handoff WA)
+    try {
+      await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          address: address.trim(),
+          subtotal: total,
+          items: lines.map((l) => ({ code: l.code, name: l.name, price: l.promoPrice ?? l.price })),
+        }),
+      })
+    } catch { /* jaringan putus — WA tetap jalan */ }
+    wa.location.href = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(message)}`
     try { wa.opener = null } catch { /* sebagian browser menolak setter — abaikan */ }
+    setSending(false)
     clearCart()
     setOpen(false)
   }

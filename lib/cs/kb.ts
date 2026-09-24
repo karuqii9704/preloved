@@ -1,7 +1,7 @@
 // Knowledge base untuk asisten CS — bersumber dari katalog live
 // (lib/catalog.ts) dan halaman syarat titip-jual. Katalog diubah di sana,
 // jawaban asisten otomatis mengikuti. Single source of truth.
-import { products } from "../catalog";
+import { getProducts } from "../catalog";
 import type { Product } from "../types";
 
 export const STORE = {
@@ -23,11 +23,15 @@ export type CatalogItem = Product & {
   conditionLabel: string;
 };
 
-export const CATALOG: CatalogItem[] = products.map((p) => ({
-  ...p,
-  effectivePrice: p.promoPrice ?? p.price,
-  conditionLabel: CONDITION_LABELS[p.condition],
-}));
+/** Katalog live dari Supabase (async). Cache per-request via getProducts. */
+export async function getCatalog(): Promise<CatalogItem[]> {
+  const prods = await getProducts();
+  return prods.map((p) => ({
+    ...p,
+    effectivePrice: p.promoPrice ?? p.price,
+    conditionLabel: CONDITION_LABELS[p.condition],
+  }));
+}
 
 export const TITIP_JUAL = {
   formUrl: "/titip-jual",

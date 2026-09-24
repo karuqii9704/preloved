@@ -2,10 +2,12 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { StoreShell } from '@/components/store-shell'
 import { AddToCart } from '@/components/add-to-cart'
-import { bySlug, formatIDR } from '@/lib/catalog'
+import { getBySlug, formatIDR } from '@/lib/catalog'
+
+export const dynamic = 'force-dynamic'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const product = bySlug((await params).slug)
+  const product = await getBySlug((await params).slug)
   if (!product) return notFound()
 
   const available = product.status === 'available'

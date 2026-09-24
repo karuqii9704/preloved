@@ -45,9 +45,10 @@ export async function POST(request: Request) {
     });
   }
 
-  // 2) Intent rutin → jawaban grounded dari katalog
+  // 2) Intent rutin → jawaban grounded dari katalog live
   if (detected) {
-    const answer = buildAnswer(detected, text);
+    const { getCatalog } = await import("@/lib/cs/kb");
+    const answer = buildAnswer(detected, text, await getCatalog());
     if (answer) {
       return NextResponse.json({
         reply: answer.reply,

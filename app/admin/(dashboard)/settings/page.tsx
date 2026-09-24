@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { ChangePassword } from '@/components/change-password'
 
 type Settings = {
   store_name: string
@@ -105,6 +106,7 @@ export default function Settings() {
           </button>
         </form>
       )}
+      <ChangePassword />
     </main>
   )
 }

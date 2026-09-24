@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
 // Dashboard admin — statistik toko langsung dari Supabase.
+export const dynamic = 'force-dynamic'
 async function getStats() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) return null

@@ -18,6 +18,9 @@ export function AdminNav() {
     <nav aria-label="Navigasi admin" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginTop: 16 }}>
       <Link href="/admin" style={{ fontWeight: 800 }}>Ringkasan</Link>
       <Link href="/admin/products">Produk</Link>
+      <Link href="/admin/slides">Slides</Link>
+      <Link href="/admin/offers">Offers</Link>
+      <Link href="/admin/categories">Kategori</Link>
       <Link href="/admin/consignments">Titip Jual</Link>
       <Link href="/admin/orders">Inquiry</Link>
       <Link href="/admin/settings">Pengaturan</Link>
