@@ -34,7 +34,7 @@ export default async function Admin() {
 
   return (
     <main className="shell section">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <header className="motion-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <p className="eyebrow">Admin</p>
           <h1 style={{ margin: 0 }}>Ringkasan toko</h1>
@@ -42,16 +42,19 @@ export default async function Admin() {
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <Link href="/" className="btn btn-secondary">Lihat toko</Link>
-          <Link href="/admin/settings" className="btn">Pengaturan kontak</Link>
+          <Link href="/admin/products/new" className="btn">Tambah produk</Link>
         </div>
       </header>
       <div className="grid" style={{ marginTop: 24, gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))' }}>
-        {cards.map(([name, value]) => (
-          <div className="card" style={{ padding: 18 }} key={name as string}>
-            <p style={{ margin: 0, color: 'var(--muted)' }}>{name}</p>
-            <strong style={{ fontSize: '2rem' }}>{value}</strong>
-          </div>
-        ))}
+        {cards.map(([name, value], i) => {
+          const href = name === 'Titip Jual baru' ? '/admin/consignments' : name === 'Total inquiry' ? '/admin/orders' : '/admin/products'
+          return (
+            <Link key={name as string} href={href} className="card motion-in-2" style={{ padding: 18, display: 'block', color: 'inherit', animationDelay: `${i * 55}ms` }}>
+              <p style={{ margin: 0, color: 'var(--muted)', fontSize: '.88rem' }}>{name}</p>
+              <strong style={{ fontSize: '2rem', lineHeight: 1.1 }}>{value}</strong>
+            </Link>
+          )
+        })}
       </div>
       <section style={{ marginTop: 36 }}>
         <h2>Kelola</h2>

@@ -83,8 +83,11 @@ test('checkout form validates and opens WhatsApp deep-link on submit', async ({ 
   await dialog.locator('textarea').fill('Jl. Melati No. 12, Kota Kerinci')
   await dialog.getByRole('button', { name: 'Pesan via WhatsApp' }).click()
   const popup = await popupPromise
-  expect(popup.url()).toMatch(/wa\.me\/628\d+|whatsapp\.com.*phone=628\d+/)
-  expect(decodeURIComponent(popup.url()).replace(/\+/g, ' ')).toContain('Cardigan Rajut Biru')
+  // popup dibuka about:blank dulu (agar lolos popup-blocker saat insert inquiry),
+  // lalu dialihkan ke wa.me / api.whatsapp.com — tunggu URL final via poll (halaman
+  // WhatsApp memblokir event load di headless, waitForURL sampai timeout).
+  await expect.poll(async () => popup.url(), { timeout: 15000 }).toMatch(/wa\.me\/628\d+|whatsapp\.com.*phone=628\d+/)
+  expect(decodeURIComponent(popup.url().replace(/\+/g, ' '))).toContain('Cardigan Rajut Biru')
   // keranjang dikosongkan setelah pesanan dikirim
   await page.waitForTimeout(300)
   const cart = await page.evaluate(() => localStorage.getItem('preloved-cart-v1'))

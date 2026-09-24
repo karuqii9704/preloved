@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { formatIDR } from '@/lib/catalog'
+import { AdminEmpty } from '@/components/admin-empty'
 
 // Monitoring inquiry WhatsApp — tercatat otomatis saat pembeli checkout.
 export const dynamic = 'force-dynamic'
@@ -34,43 +35,32 @@ export default async function Orders() {
   const rows = await getInquiries()
   return (
     <main className="shell section">
+      
       <p className="eyebrow">Admin</p>
       <h1 style={{ margin: '4px 0' }}>Inquiry WhatsApp</h1>
       <p style={{ color: 'var(--muted)' }}>Tercatat otomatis tiap checkout. Tindaklanjuti lewat WhatsApp; status diubah manual di database.</p>
       {rows === null ? (
-        <div className="card" style={{ padding: 24, marginTop: 24 }}>
-          <p style={{ margin: 0 }}>Gagal memuat. Periksa koneksi Supabase.</p>
-        </div>
+        <AdminEmpty title="Gagal memuat inquiry" body="Periksa koneksi Supabase." />
       ) : rows.length === 0 ? (
-        <div className="card" style={{ padding: 24, marginTop: 24 }}>
-          <p style={{ margin: 0 }}>Belum ada inquiry masuk.</p>
-        </div>
+        <AdminEmpty title="Belum ada inquiry" body="Inquiry tercatat otomatis saat pembeli menekan tombol pesanan di halaman keranjang." />
       ) : (
-        <div style={{ overflowX: 'auto', marginTop: 24 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+        <div className="admin-scroll">
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--line)' }}>
-                <th style={{ padding: '10px 12px' }}>Waktu</th>
-                <th style={{ padding: '10px 12px' }}>Pembeli</th>
-                <th style={{ padding: '10px 12px' }}>Detail</th>
-                <th style={{ padding: '10px 12px' }}>Subtotal</th>
-                <th style={{ padding: '10px 12px' }}>Status</th>
+              <tr>
+                <th>Waktu</th><th>Pembeli</th><th>Detail</th><th>Subtotal</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} style={{ borderBottom: '1px solid var(--line)', verticalAlign: 'top' }}>
-                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                <tr key={r.id}>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     {new Date(r.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
                   </td>
-                  <td style={{ padding: '10px 12px', fontWeight: 700 }}>{r.buyer_name}</td>
-                  <td style={{ padding: '10px 12px', whiteSpace: 'pre-line', color: 'var(--muted)', fontSize: '.9rem' }}>{r.buyer_address}</td>
-                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatIDR(r.subtotal_idr)}</td>
-                  <td style={{ padding: '10px 12px' }}>
-                    <span className="stock-badge stock-badge-available" style={{ fontSize: '.8rem' }}>
-                      {STATUS_LABEL[r.status] ?? r.status}
-                    </span>
-                  </td>
+                  <td style={{ fontWeight: 700 }}>{r.buyer_name}</td>
+                  <td style={{ whiteSpace: 'pre-line', color: 'var(--muted)', fontSize: '.88rem' }}>{r.buyer_address}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{formatIDR(r.subtotal_idr)}</td>
+                  <td><span className={`pill ${r.status === 'inquiry' ? 'pill-mute' : r.status === 'cancelled' ? 'pill-off' : 'pill-ok'}`}>{STATUS_LABEL[r.status] ?? r.status}</span></td>
                 </tr>
               ))}
             </tbody>

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import { formatIDR } from '@/lib/catalog'
+import { AdminEmpty } from '@/components/admin-empty'
 
 // Monitoring Titip Jual — daftar pengajuan jastip dari Supabase.
 export const dynamic = 'force-dynamic'
@@ -45,51 +46,39 @@ export default async function Consignments() {
       <h1 style={{ margin: '4px 0' }}>Titip Jual</h1>
       <p style={{ color: 'var(--muted)' }}>Pengajuan dari halaman /titip-jual. Hubungi penjual via WhatsApp; ubah status di database setelah review.</p>
       {rows === null ? (
-        <div className="card" style={{ padding: 24, marginTop: 24 }}>
-          <p style={{ margin: 0 }}>Gagal memuat. Periksa koneksi Supabase.</p>
-        </div>
+        <AdminEmpty title="Gagal memuat pengajuan" body="Periksa koneksi Supabase." />
       ) : rows.length === 0 ? (
-        <div className="card" style={{ padding: 24, marginTop: 24 }}>
-          <p style={{ margin: 0 }}>Belum ada pengajuan Titip Jual.</p>
-        </div>
+        <AdminEmpty title="Belum ada pengajuan" body="Pengajuan dari halaman /titip-jual akan muncul di sini beserta foto barangnya." />
       ) : (
-        <div style={{ overflowX: 'auto', marginTop: 24 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 720 }}>
+        <div className="admin-scroll">
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--line)' }}>
-                <th style={{ padding: '10px 12px' }}>Masuk</th>
-                <th style={{ padding: '10px 12px' }}>Penjual</th>
-                <th style={{ padding: '10px 12px' }}>Barang</th>
-                <th style={{ padding: '10px 12px' }}>Harga bersih diminta</th>
-                <th style={{ padding: '10px 12px' }}>Foto</th>
-                <th style={{ padding: '10px 12px' }}>Status</th>
-                <th style={{ padding: '10px 12px' }}></th>
+              <tr>
+                <th>Masuk</th><th>Penjual</th><th>Barang</th><th>Harga bersih diminta</th><th>Foto</th><th>Status</th><th></th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} style={{ borderBottom: '1px solid var(--line)', verticalAlign: 'top' }}>
-                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                <tr key={r.id}>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     {new Date(r.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
                   </td>
-                  <td style={{ padding: '10px 12px', fontWeight: 700 }}>
+                  <td style={{ fontWeight: 700 }}>
                     {r.seller_name}
-                    <div style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '.85rem' }}>
+                    <div className="admin-sub">
                       <a href={`https://wa.me/${r.seller_whatsapp}`} target="_blank" rel="noreferrer">{r.seller_whatsapp}</a>
                     </div>
                   </td>
-                  <td style={{ padding: '10px 12px' }}>
+                  <td>
                     {r.product_name}
-                    <div style={{ color: 'var(--muted)', fontSize: '.85rem' }}>
+                    <div className="admin-sub">
                       {r.categories?.name ?? '—'} · {COND[r.condition] ?? r.condition}
                     </div>
                   </td>
-                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatIDR(r.requested_net_price_idr)}</td>
-                  <td style={{ padding: '10px 12px' }}>{r.consignment_request_images.length} file</td>
-                  <td style={{ padding: '10px 12px' }}>
-                    <span className="stock-badge stock-badge-available" style={{ fontSize: '.8rem' }}>{STATUS[r.status] ?? r.status}</span>
-                  </td>
-                  <td style={{ padding: '10px 12px' }}><Link href={`/admin/consignments/${r.id}`}>Detail</Link></td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{formatIDR(r.requested_net_price_idr)}</td>
+                  <td>{r.consignment_request_images.length} file</td>
+                  <td><span className={`pill ${r.status === 'pending' ? 'pill-warn' : r.status === 'published' || r.status === 'settled' ? 'pill-ok' : r.status === 'rejected' || r.status === 'withdrawn' ? 'pill-off' : 'pill-mute'}`}>{STATUS[r.status] ?? r.status}</span></td>
+                  <td><Link href={`/admin/consignments/${r.id}`} style={{ fontWeight: 700 }}>Detail →</Link></td>
                 </tr>
               ))}
             </tbody>
